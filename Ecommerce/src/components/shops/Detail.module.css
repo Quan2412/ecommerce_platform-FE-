@@ -1,0 +1,37 @@
+/* Container chính cho chi tiết sản phẩm */
+.productDetail {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+  
+  /* Ảnh sản phẩm */
+  .productImage {
+    width: 33%; /* Chiếm khoảng 1/3 màn hình */
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* Box thông tin chi tiết sản phẩm */
+  .productInfo {
+    width: 60%; /* Chiếm khoảng 2/3 màn hình */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .productInfo h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .productInfo p {
+    font-size: 1rem;
+    margin: 8px 0;
+  }
+  
