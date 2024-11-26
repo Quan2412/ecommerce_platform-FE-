@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import './index.css'
-
 const AuthPages = () => {
-  // Các state quản lý form
-  const [isLogin, setIsLogin] = useState(true);  // true: đăng nhập, false: đăng ký
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-  const [errors, setErrors] = useState({});  // Lưu trữ các lỗi validation
-  const [loading, setLoading] = useState(false);  // Trạng thái loading
-  const [message, setMessage] = useState({ text: '', type: '' });  // Thông báo cho người dùng
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
@@ -42,18 +40,19 @@ const AuthPages = () => {
       newErrors.email = 'Email không hợp lệ';
     }
 
-    // Validate mật khẩu
+    // Validate password
     if (!formData.password) {
       newErrors.password = 'Mật khẩu là bắt buộc';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
     }
 
-    // Validate thêm cho form đăng ký
+    // Validate các trường bổ sung cho đăng ký
     if (!isLogin) {
       if (!formData.name) {
         newErrors.name = 'Họ tên là bắt buộc';
       }
+
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Xác nhận mật khẩu là bắt buộc';
       } else if (formData.confirmPassword !== formData.password) {
@@ -65,102 +64,13 @@ const AuthPages = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Xử lý gửi form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setMessage({ text: '', type: '' });
-
-      // Chuẩn bị dữ liệu gửi lên server
-      const requestData = isLogin ? {
-        username: formData.email,
-        password: formData.password
-      } : {
-        username: formData.email,
-        email: formData.email,
-        password: formData.password,
-        name: formData.name
-      };
-
-      // Gọi API đăng nhập/đăng ký
-      const response = await fetch(`http://localhost:8080/auth/api/${isLogin ? 'login' : 'register'}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      const data = await response.json();
-
-      // Xử lý các loại lỗi từ server
-      if (!response.ok) {
-        if (response.status === 400) {
-          throw new Error('Email này đã được sử dụng');
-        } else if (response.status === 401) {
-          throw new Error('Email hoặc mật khẩu không chính xác');
-        } else if (response.status === 409) {
-          throw new Error('Email này đã được sử dụng');
-        } else {
-          throw new Error(data.message || 'Đã xảy ra lỗi');
-        }
-      }
-
-      // Xử lý thành công
-      setMessage({ 
-        text: isLogin ? 'Đăng nhập thành công!' : 'Đăng ký thành công! Vui lòng đăng nhập', 
-        type: 'success' 
-      });
-
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        
-        // Chuyển hướng sau khi đăng nhập thành công
-        if (isLogin) {
-          setTimeout(() => {
-            window.location.href = 'http://localhost:3000';
-          }, 3000); // Đợi 3 giây trước khi chuyển hướng
-        }
-      }
-
-      // Nếu đăng ký thành công, chuyển sang form đăng nhập
-      if (!isLogin) {
-        setTimeout(() => {
-          setIsLogin(true);
-          // Reset form
-          setFormData({
-            name: '',
-            email: '',
-            password: '',
-            confirmPassword: ''
-          });
-        }, 2000);
-      }
-
-    } catch (error) {
-      console.error('Lỗi:', "Username không hợp lệ/đã tồn tại!");
-      setMessage({ 
-        text: error.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 
-        type: 'error' 
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Xử lý đăng nhập với Google
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
+      // Thêm code xử lý đăng nhập Google ở đây
+ 
       setMessage({ text: 'Đang chuyển hướng đến Google...', type: 'info' });
-      // TODO: Thêm xử lý đăng nhập Google
     } catch (error) {
       setMessage({ text: 'Đăng nhập với Google thất bại', type: 'error' });
     } finally {
@@ -172,8 +82,9 @@ const AuthPages = () => {
   const handleFacebookLogin = async () => {
     try {
       setLoading(true);
+      // Thêm code xử lý đăng nhập Facebook ở đây
+ 
       setMessage({ text: 'Đang chuyển hướng đến Facebook...', type: 'info' });
-      // TODO: Thêm xử lý đăng nhập Facebook
     } catch (error) {
       setMessage({ text: 'Đăng nhập với Facebook thất bại', type: 'error' });
     } finally {
@@ -181,10 +92,82 @@ const AuthPages = () => {
     }
   };
 
+  // Xử lý submit form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage({ text: '', type: '' });
+
+      if (isLogin) {
+        // Xử lý gọi API đăng nhập
+        
+        const response = await fetch('localhost:8080/auth/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Đăng nhập thất bại');
+        }
+
+        const data = await response.json();
+        // Lưu token vào localStorage hoặc Cookie
+        localStorage.setItem('token', data.token);
+        
+        setMessage({ text: 'Đăng nhập thành công!', type: 'success' });
+        // Chuyển hướng sau khi đăng nhập thành công
+        // window.location.href = '/dashboard';
+      } else {
+        // Xử lý API đăng ký
+        
+        const response = await fetch('localhost:8080/auth/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Đăng ký thất bại');
+        }
+
+        setMessage({ text: 'Đăng ký thành công! Vui lòng đăng nhập.', type: 'success' });
+        // Chuyển sang form đăng nhập sau khi đăng ký thành công
+        setIsLogin(true);
+      }
+    } catch (error) {
+      setMessage({ 
+        text: error.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 
+        type: 'error' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
+ 
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-xl shadow-lg">
-        {/* Thanh chuyển đổi Đăng nhập/Đăng ký */}
+        {/* Tab switcher */}
         <div className="flex space-x-2 border-b">
           <button
             className={`pb-2 px-4 ${
@@ -196,13 +179,6 @@ const AuthPages = () => {
               setIsLogin(true);
               setErrors({});
               setMessage({ text: '', type: '' });
-              // Reset form khi chuyển tab
-              setFormData({
-                name: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-              });
             }}
           >
             Đăng nhập
@@ -217,35 +193,24 @@ const AuthPages = () => {
               setIsLogin(false);
               setErrors({});
               setMessage({ text: '', type: '' });
-              // Reset form khi chuyển tab
-              setFormData({
-                name: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-              });
             }}
           >
             Đăng ký
           </button>
         </div>
 
-        {/* Hiển thị thông báo lỗi/thành công */}
+        {/* Message display */}
         {message.text && (
-          <div 
-            className={`p-3 rounded ${
-              message.type === 'error' 
-                ? 'bg-red-100 text-red-700 border border-red-300' 
-                : message.type === 'success' 
-                ? 'bg-green-100 text-green-700 border border-green-300'
-                : 'bg-blue-100 text-blue-700 border border-blue-300'
-            }`}
-          >
+          <div className={`p-3 rounded ${
+            message.type === 'error' ? 'bg-red-100 text-red-700' :
+            message.type === 'success' ? 'bg-green-100 text-green-700' :
+            'bg-blue-100 text-blue-700'
+          }`}>
             {message.text}
           </div>
         )}
 
-        {/* Container form */}
+        {/* Form container */}
         <div>
           <h2 className="text-2xl font-bold text-center text-gray-800">
             {isLogin ? 'Đăng nhập' : 'Tạo tài khoản mới'}
@@ -257,23 +222,24 @@ const AuthPages = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            {/* Trường họ tên - chỉ hiển thị khi đăng ký */}
+            {/* Form fields */}
             {!isLogin && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Họ và tên
                 </label>
                 <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                    {/* <FaUser className="text-gray-400" /> */}
+                  </div>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`appearance-none block w-full px-3 py-2 border 
-                      ${errors.name ? 'border-red-500' : 'border-gray-300'}
-                      rounded-md shadow-sm placeholder-gray-400
-                      focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder="Nhập họ và tên của bạn"
+                    className={`appearance-none block w-full pl-10 pr-3 py-2 border ${
+                      errors.name ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                   />
                 </div>
                 {errors.name && (
@@ -282,22 +248,22 @@ const AuthPages = () => {
               </div>
             )}
 
-            {/* Trường email */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Email
               </label>
               <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                  {/* <FaEnvelope className="text-gray-400" /> */}
+                </div>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-2 border 
-                    ${errors.email ? 'border-red-500' : 'border-gray-300'}
-                    rounded-md shadow-sm placeholder-gray-400
-                    focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                  placeholder="Nhập địa chỉ email"
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                 />
               </div>
               {errors.email && (
@@ -305,22 +271,22 @@ const AuthPages = () => {
               )}
             </div>
 
-            {/* Trường mật khẩu */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Mật khẩu
               </label>
               <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                  {/* <FaLock className="text-gray-400" /> */}
+                </div>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-2 border 
-                    ${errors.password ? 'border-red-500' : 'border-gray-300'}
-                    rounded-md shadow-sm placeholder-gray-400
-                    focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                  placeholder="Nhập mật khẩu"
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${
+                    errors.password ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                 />
               </div>
               {errors.password && (
@@ -328,23 +294,23 @@ const AuthPages = () => {
               )}
             </div>
 
-            {/* Trường xác nhận mật khẩu - chỉ hiển thị khi đăng ký */}
             {!isLogin && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Xác nhận mật khẩu
                 </label>
                 <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                    {/* <FaLock className="text-gray-400" /> */}
+                  </div>
                   <input
                     type="password"
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`appearance-none block w-full px-3 py-2 border 
-                      ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}
-                      rounded-md shadow-sm placeholder-gray-400
-                      focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                    placeholder="Nhập lại mật khẩu"
+                    className={`appearance-none block w-full pl-10 pr-3 py-2 border ${
+                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                   />
                 </div>
                 {errors.confirmPassword && (
@@ -353,19 +319,15 @@ const AuthPages = () => {
               </div>
             )}
 
-            {/* Nút submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent 
-                rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 
-                hover:bg-blue-700 focus:outline-none focus:ring-2 
-                focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {loading ? 'Đang xử lý...' : (isLogin ? 'Đăng nhập' : 'Đăng ký')}
             </button>
 
-            {/* Phần đăng nhập mạng xã hội */}
+            {/* Social login */}
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -383,22 +345,18 @@ const AuthPages = () => {
                   type="button"
                   onClick={handleFacebookLogin}
                   disabled={loading}
-                  className="w-full flex items-center justify-center px-4 py-2 
-                    border border-gray-300 rounded-md shadow-sm text-sm 
-                    font-medium text-gray-700 bg-white hover:bg-gray-50 
-                    disabled:opacity-50"
+                  className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                 >
+                  {/* <FaFacebook className="text-blue-600 mr-2" /> */}
                   Facebook
                 </button>
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={loading}
-                  className="w-full flex items-center justify-center px-4 py-2 
-                    border border-gray-300 rounded-md shadow-sm text-sm 
-                    font-medium text-gray-700 bg-white hover:bg-gray-50 
-                    disabled:opacity-50"
+                  className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                 >
+                  {/* <FaGoogle className="text-red-600 mr-2" /> */}
                   Google
                 </button>
               </div>
@@ -407,6 +365,7 @@ const AuthPages = () => {
         </div>
       </div>
     </div>
+
   );
 };
 

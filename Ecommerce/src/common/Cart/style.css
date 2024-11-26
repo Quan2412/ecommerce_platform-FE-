@@ -76,6 +76,9 @@
   font-weight: 500;
   color: #e94560;
 }
+.cart-total {
+  height: 200px;
+}
 .cart-total h2 {
   font-size: 18px;
   margin-bottom: 20px;

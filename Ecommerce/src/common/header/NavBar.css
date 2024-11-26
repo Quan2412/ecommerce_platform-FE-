@@ -1,0 +1,33 @@
+.category {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia layout thành 2 cột */
+    gap: 0px; /* Loại bỏ khoảng cách giữa các cột */
+    padding: 10px;
+  }
+  
+  .category .box {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px; /* Căn chỉnh khoảng cách bên trong mỗi mục */
+    cursor: pointer;
+    border: none; /* Xóa viền nếu có */
+    background: none; /* Đảm bảo không có màu nền */
+  }
+  
+  .category .box:hover {
+    background-color: #f5f5f5; /* Thêm hiệu ứng hover nếu cần */
+  }
+  
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px; /* Chiều rộng dropdown */
+    margin-top: 10px;
+    z-index: 1000;
+  }
+  
